@@ -1,0 +1,78 @@
+package project.sagittarius.client;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.PictureCallback;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.webkit.WebView.FindListener;
+
+class Connecter extends AsyncTask<String, String, String> {
+	
+	private Socket client;
+	private PrintWriter out;
+	private BufferedReader in;
+	
+	private Camera camera;
+	private Activity activity;
+
+	public Connecter(Activity activity) {
+		this.activity = activity;
+	}
+	
+	@Override
+	protected String doInBackground(String... params) {
+		Log.d("debug", "Trying to connect to:" + params[0]);
+		try{
+		   client = new Socket(params[0], 4321);
+		   out = new PrintWriter(client.getOutputStream(),true);
+		   in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+		   camera = Camera.open(findFrontFacingCamera());
+		   camera.takePicture(null, null,
+			        new PictureCallback() {
+						
+						@Override
+						public void onPictureTaken(byte[] data, Camera camera) {
+							Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+							findView
+						}
+					});
+
+		} catch(UnknownHostException e) {
+		   Log.d("debug", "Unknown host: " + params[0]);
+
+		} catch(IOException e) {
+			Log.d("debug", e.getLocalizedMessage());
+		}
+		return null;
+	}
+	
+	private int findFrontFacingCamera() {
+	    int cameraId = -1;
+	    // Search for the front facing camera
+	    int numberOfCameras = Camera.getNumberOfCameras();
+	    for (int i = 0; i < numberOfCameras; i++) {
+	      CameraInfo info = new CameraInfo();
+	      Camera.getCameraInfo(i, info);
+	      if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
+	        Log.d("debug", "Camera found");
+	        cameraId = i;
+	        break;
+	      }
+	    }
+	    return cameraId;
+	  }
+   
+
+}

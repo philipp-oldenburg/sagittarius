@@ -1,0 +1,47 @@
+package project.sagittarius.client;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import android.os.AsyncTask;
+
+class Connecter extends AsyncTask<String, String, String> {
+
+    private Exception exception;
+
+	@Override
+	protected String doInBackground(String... params) {
+		ServerSocket server = null;
+
+		try{
+		   server = new ServerSocket(4321); 
+		} catch (IOException e) {
+		   System.out.println("Could not listen on port 4321");
+		}
+		
+		System.out.println("Listening on port 4321");
+		Socket client = null;
+
+		try{
+		   client = server.accept();
+		} catch (IOException e) {
+		   System.out.println("Accept failed: 4321");
+		}
+		
+		System.out.println("Connected to:" + client.getLocalAddress());
+
+		try{
+		   BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+		   PrintWriter out = new PrintWriter(client.getOutputStream(),true);
+		} catch (IOException e) {
+		   System.out.println("Read failed");
+		}
+		return null;
+	}
+   
+
+}

@@ -1,0 +1,10 @@
+package project.sagittarius.client;
+
+import android.os.AsyncTask;
+
+class Connecter extends AsyncTask<String, String, String> {
+
+    private Exception exception;
+   
+
+}

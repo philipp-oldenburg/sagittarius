@@ -1,0 +1,11 @@
+import java.awt.image.BufferedImage;
+
+import javax.swing.JPanel;
+
+
+public class MyJPanel extends JPanel {
+	
+	public MyJPanel(BufferedImage img) {
+		this.img = img;
+	}
+}

@@ -1,0 +1,82 @@
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.Socket;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+
+public class Listener extends Thread {
+
+	private Socket client;
+
+	public Listener(Socket client) {
+		this.client = client;
+	}
+
+	public void run() {
+		DataInputStream in = null;
+		try {
+			in = new DataInputStream(client.getInputStream());
+		} catch (IOException e) {
+			System.out.println("Read failed");
+		}
+		
+		while (true) {
+			try {
+				int length = in.readInt();
+				System.out.println("empfange picture");
+				if (length > 0) {
+					byte[] message = new byte[length];
+					in.readFully(message, 0, message.length);
+					System.out.println(message.length);
+					JFrame frame = new JFrame();
+					ImageIcon icon = new ImageIcon(message);
+					BufferedImage image = toBufferedImage(icon.getImage());
+					image = resize(image, 1200, 900);
+					MyJPanel myPanel = new MyJPanel(image);
+					frame.add(myPanel);
+					frame.pack();
+					frame.setVisible(true);
+					frame.toFront();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static BufferedImage resize(BufferedImage image, int width,
+			int height) {
+		BufferedImage bi = new BufferedImage(width, height,
+				BufferedImage.TRANSLUCENT);
+		Graphics2D g2d = (Graphics2D) bi.createGraphics();
+		g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING,
+				RenderingHints.VALUE_RENDER_QUALITY));
+		g2d.drawImage(image, 0, 0, width, height, null);
+		g2d.dispose();
+		return bi;
+	}
+
+	public static BufferedImage toBufferedImage(Image img) {
+		if (img instanceof BufferedImage) {
+			return (BufferedImage) img;
+		}
+
+		// Create a buffered image with transparency
+		BufferedImage bimage = new BufferedImage(img.getWidth(null),
+				img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+		// Draw the image on to the buffered image
+		Graphics2D bGr = bimage.createGraphics();
+		bGr.drawImage(img, 0, 0, null);
+		bGr.dispose();
+
+		// Return the buffered image
+		return bimage;
+	}
+
+}

@@ -1,0 +1,10 @@
+import java.net.ServerSocket;
+
+
+public class ClientWaiter extends Thread {
+
+	public ClientWaiter(ServerSocket server) {
+		this.server = server;
+	}
+
+}

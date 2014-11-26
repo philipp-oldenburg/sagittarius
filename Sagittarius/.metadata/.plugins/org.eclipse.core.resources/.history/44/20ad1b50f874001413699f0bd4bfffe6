@@ -1,0 +1,56 @@
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+
+public class Server {
+	
+	private DataInputStream in;
+	private PrintWriter out;
+
+	public static void main(String[] args) {
+		new Server().run();
+	}
+
+	private void run() {
+		ServerSocket server = null;
+
+		try{
+		   server = new ServerSocket(4321); 
+		} catch (IOException e) {
+		   System.out.println("Could not listen on port 4321");
+		}
+		
+		System.out.println("Listening on port 4321");
+		Socket client = null;
+
+		try{
+		   client = server.accept();
+		} catch (IOException e) {
+		   System.out.println("Accept failed: 4321");
+		}
+		
+		System.out.println("Connected to:" + client.getLocalAddress());
+
+		try{
+		   in = new DataInputStream(client.getInputStream());
+		   out = new PrintWriter(client.getOutputStream(),true);
+		} catch (IOException e) {
+		   System.out.println("Read failed");
+		}
+		try {
+			int length = in.readInt();                    // read length of incoming message
+			if(length>0) {
+			    byte[] message = new byte[length];
+			    in.readFully(message, 0, message.length); // read the message
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}

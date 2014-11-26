@@ -1,0 +1,37 @@
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+
+
+public class Server {
+	
+	private DataInputStream in;
+
+	public static void main(String[] args) {
+		new Server().run();
+	}
+
+	private void run() {
+		ServerSocket server = null;
+		try{
+		   server = new ServerSocket(4321); 
+		} catch (IOException e) {
+		   System.out.println("Could not listen on port 4321");
+		}
+		System.out.println("Listening on port 4321");
+		
+		ClientWaiter clientWaiter = new ClientWaiter(server);
+		clientWaiter.start();
+	}
+	
+	
+
+}

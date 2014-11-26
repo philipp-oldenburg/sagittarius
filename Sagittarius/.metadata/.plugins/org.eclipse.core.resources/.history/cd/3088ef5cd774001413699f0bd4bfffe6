@@ -1,0 +1,15 @@
+package project.sagittarius.client;
+
+import android.os.AsyncTask;
+
+class Connecter extends AsyncTask<String> {
+
+    private Exception exception;
+    
+	@Override
+	protected Object doInBackground(Object... params) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

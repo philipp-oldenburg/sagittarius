@@ -53,6 +53,7 @@ public class Listener extends Thread {
 			} catch (IOException e) {
 				if (e instanceof EOFException) {
 					System.out.println("cancel connection to:"+client.getLocalAddress());
+					frame.setVisible(false);
 					break;
 				}
 				e.printStackTrace();

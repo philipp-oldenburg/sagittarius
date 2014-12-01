@@ -6,5 +6,7 @@
     <string name="tf_serverip">ServerIP</string>
     <string name="bt_connect">Connect</string>
     <string name="bt_sendPicture">Send Picture</string>
+    <string name="bt_autoPicStart">Start Auto-Send</string>
+    <string name="bt_autoPicStop">Stop Auto-Send</string>
 
 </resources>

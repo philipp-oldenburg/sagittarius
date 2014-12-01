@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -16,12 +15,7 @@ class Connecter extends AsyncTask<String, String, String> {
 	
 	private Socket client;
 	private DataOutputStream out;
-	private BufferedReader in;
-	
-	private Activity activity;
-
 	public Connecter(Activity activity) {
-		this.activity = activity;
 	}
 	
 	@Override
@@ -30,7 +24,7 @@ class Connecter extends AsyncTask<String, String, String> {
 		try{
 		   client = new Socket(params[0], 4321);
 		   out = new DataOutputStream(client.getOutputStream());
-		   in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+		   new BufferedReader(new InputStreamReader(client.getInputStream()));
 		} catch(UnknownHostException e) {
 		   Log.d("debug", "Unknown host: " + params[0]);
 
@@ -45,6 +39,7 @@ class Connecter extends AsyncTask<String, String, String> {
 			Log.d("debug", "length:" + data.length);
 			out.writeInt(data.length);
 			out.write(data);
+			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -1,10 +1,7 @@
 package project.sagittarius.client;
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
@@ -16,8 +13,8 @@ import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 
 @SuppressWarnings("deprecation")
@@ -27,13 +24,18 @@ public class MainActivity extends Activity {
     private Activity activity;
 	private Camera camera;
 	private Connecter connecter;
+	private boolean autoPicturing;
+	private PictureTaker pictureTaker;
+	private byte[] newestPicture;
+	private boolean newPicAvailable;
+	private PictureSender pictureSender;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        
+        autoPicturing = false;
         int camId = findFrontFacingCamera();
         camera = Camera.open(camId);
         
@@ -61,9 +63,105 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				makePicture();
 			}
-    	});   
+    	});
+    	
+    	findViewById(R.id.bt_autoPic).setOnClickListener(new OnClickListener() {
+    		
+
+			public void onClick(View v) {
+				if (!autoPicturing) {
+					autoPicturing = true;
+					((Button) (findViewById(R.id.bt_autoPic))).setText(getResources().getString(R.string.bt_autoPicStop));
+					pictureSender = new PictureSender();
+					pictureSender.start();
+					pictureTaker = new PictureTaker();
+					pictureTaker.start();
+				} else {
+					autoPicturing = false;
+					((Button) (findViewById(R.id.bt_autoPic))).setText(getResources().getString(R.string.bt_autoPicStart));
+					pictureTaker.stopPicturing();
+					pictureSender.stopSending();
+				}
+			}
+    	});
     }
 	
+	class PictureSender extends Thread {
+		private boolean running;
+		private long time;
+
+		@Override
+		public void run() {
+			running = true;
+			while (running) {
+				if (newPicAvailable) {
+					Log.d("debug", "test");
+					newPicAvailable = false;
+					time = System.currentTimeMillis();
+					connecter.sendData(newestPicture);
+					Log.d("debug", "sending picture took:"+(System.currentTimeMillis()-time)+"ms");
+				} else {
+					synchronized (pictureSender) {
+						try {
+							pictureSender.wait();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+
+		public void stopSending() {
+			running = false;
+			synchronized (pictureSender) {
+				pictureSender.notify();
+			}
+		}
+		
+		
+	}
+	
+	class PictureTaker extends Thread {
+		private boolean running;
+		private long time;
+		@Override
+		public void run() {
+			running = true;
+			while (running) {
+				camera.startPreview();
+				time = System.currentTimeMillis();
+				camera.takePicture(null, null, new PictureCallback() {
+
+					@Override
+					public void onPictureTaken(byte[] data, Camera camera) {
+						Log.d("debug", "taking picture took:"+(System.currentTimeMillis()-time)+"ms");
+						newestPicture = data;
+						newPicAvailable = true;
+						synchronized (pictureSender) {
+							pictureSender.notify();
+						}
+						Log.d("debug", "pic taken");
+						synchronized (pictureTaker) {
+							pictureTaker.notify();
+						}
+					}
+				});
+				try {
+					synchronized (this) {
+						wait();
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+
+		public void stopPicturing() {
+			running = false;
+		}
+	}
 	
 	private int findFrontFacingCamera() {
 		int cameraId = -1;

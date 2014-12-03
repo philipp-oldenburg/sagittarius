@@ -1,6 +1,9 @@
+import javax.swing.JFrame;
+
 import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacpp.opencv_core.CvContour;
 import org.bytedeco.javacpp.opencv_core.IplImage;
+import org.bytedeco.javacv.CanvasFrame;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
@@ -15,7 +18,7 @@ public class Test {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 //		Mat mat = Mat.eye(3, 3, CvType.CV_8UC1);
 //		System.out.println("mat = " + mat.dump());
-		Mat image = Highgui.imread("pics/balloon.jpeg");
+		Mat image = Highgui.imread("pics/balloon4.jpg");
 		if (image.empty())
 		{
 		    System.out.println("Failed to read file.");
@@ -26,25 +29,50 @@ public class Test {
 		//Core.inRange(image, new Scalar(40, 0, 180), new Scalar(135, 110, 255), red_image);
 		//Core.inRange(image, new Scalar(50, 20, 20), new Scalar(244, 194, 194), red_image);
 		Core.inRange(image, new Scalar(0, 0, 110), new Scalar(60, 60, 255), red_image);
+		//invert colors
+		Mat invertcolormatrix= new Mat(red_image.rows(),red_image.cols(), red_image.type(), new Scalar(255,255,255));
+		Core.subtract(invertcolormatrix, red_image, red_image);
 		Highgui.imwrite("pics/out.png", red_image);
 		
-		detectEllipse(red_image);
+		fillOutContures();
+		detectEllipse();
 	}
 	
-	// One way to tell if an object is an ellipse is to look at the relationship
-	// of its area to its dimensions.  If its actual occupied area can be estimated
-	// using the well-known area formula Area = PI*A*B, then it has a good chance of
-	// being an ellipse.
+	
 
-	private static void detectEllipse(Mat red_image) {
-		double MAX_TOL = 300.00;
+	private static void fillOutContures() {
+
+        CvMemStorage storage=CvMemStorage.create();
+        CvSeq contours = new CvContour();
+        IplImage src = cvLoadImage("pics/out.png", 0);
+        IplImage gry  = cvCreateImage( cvGetSize(src), 8, 1 );
+        cvThreshold(src, src, 1, 255, CV_THRESH_BINARY_INV);
+        cvFindContours(src, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+        for( ; contours != null; contours = contours.h_next()) {
+        	CvScalar color = CV_RGB(255, 255, 255);
+            cvDrawContours( gry, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
+        }
+        cvXorS(gry, cvScalar(255, 0, 0, 0), gry, null);
+        
+        cvSaveImage("pics/out2.png", gry);
+	}
+	
+	
+	
+	// One way to tell if an object is an ellipse is to look at the relationship
+		// of its area to its dimensions.  If its actual occupied area can be estimated
+		// using the well-known area formula Area = PI*A*B, then it has a good chance of
+		// being an ellipse.
+	private static void detectEllipse() {
+		
+		double MAX_TOL = 10000.00;
 		// This value is the maximum permissible error between actual and estimated area.
 		double MIN_AREA = 100.00;
 		// We need this to be high enough to get rid of things that are too small too
 		// have a definite shape.  Otherwise, they will end up as ellipse false positives.
 		IplImage src;
 	    // the first command line parameter must be file name of binary (black-n-white) image
-	    if((src=cvLoadImage("pics/out2.jpeg", 0))!= null)
+	    if((src=cvLoadImage("pics/out2.png", 0))!= null)
 	    {
 	        IplImage dst  = cvCreateImage( cvGetSize(src), 8, 3 );
 	        CvMemStorage storage = cvCreateMemStorage(0);
@@ -62,7 +90,7 @@ public class Test {
 	        for( ; contour != null; contour = contour.h_next())
 	        {
 	            double actual_area = Math.abs(cvContourArea(contour, CV_WHOLE_SEQ, 0));
-	            System.out.println(actual_area);
+	            System.out.println("actual area: " + actual_area);
 	            if (actual_area < MIN_AREA)
 	                continue;
 
@@ -81,7 +109,7 @@ public class Test {
 	            int B = rect.height() / 2;
 	            double estimated_area = Math.PI * A * B;
 	            double error = Math.abs(actual_area - estimated_area);
-	            System.out.println(error);
+	            System.out.println("error: " + error);
 	            if (error > MAX_TOL)
 	                continue;    
 	            System.out.println("center x: " + rect.x() + A + " y: " + rect.y() + B + " A: " + A + " B: " + B + "\n");

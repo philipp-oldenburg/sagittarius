@@ -29,3 +29,10 @@ local.properties
 .buildpath
 .metadata
 .metadata
+gen
+bin
+.settings
+.settings
+bin
+.project
+.project

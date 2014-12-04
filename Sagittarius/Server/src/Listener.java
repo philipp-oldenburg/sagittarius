@@ -45,6 +45,11 @@ public class Listener extends Thread {
 					ImageIcon icon = new ImageIcon(message);
 					Image rotatedImage = rotate(icon.getImage(), 90);
 					BufferedImage image = toBufferedImage(rotatedImage);
+					Detector.DetectedObject[] objects = Detector.detectBalloon(image);
+					Graphics2D g2 = image.createGraphics();
+					for (Detector.DetectedObject detectedObject : objects) {
+						g2.drawOval(detectedObject.x - detectedObject.width, detectedObject.y - detectedObject.height, detectedObject.width, detectedObject.height);
+					}
 					image = resize(image, 600, 800);
 					myPanel.setImage(image);
 					myPanel.repaint();

@@ -44,6 +44,16 @@ class Connecter extends AsyncTask<String, String, String> {
 			e.printStackTrace();
 		}
 	}
+
+	public void disconnect() {
+		try {
+			client.close();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
    
 
 }

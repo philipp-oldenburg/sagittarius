@@ -4,6 +4,7 @@ import java.io.IOException;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +29,7 @@ public class MainActivity extends Activity {
 	private PictureTaker pictureTaker;
 	private byte[] newestPicture;
 	private boolean newPicAvailable;
+	private boolean connected;
 	private PictureSender pictureSender;
 
 	@Override
@@ -38,6 +40,10 @@ public class MainActivity extends Activity {
         autoPicturing = false;
         int camId = findFrontFacingCamera();
         camera = Camera.open(camId);
+        
+        Parameters parameters = camera.getParameters();
+        parameters.setPictureSize(2048, 1232);
+        camera.setParameters(parameters);
         
 		SurfaceView mview = new SurfaceView(getApplicationContext());
 		try {
@@ -50,11 +56,20 @@ public class MainActivity extends Activity {
 		
         tf_connect = (EditText)findViewById(R.id.tf_ip);
         
-    	findViewById(R.id.bt_connect).setOnClickListener(new OnClickListener() {
-    		
+        final Button buttonConnect = (Button) findViewById(R.id.bt_connect);
+    	buttonConnect.setOnClickListener(new OnClickListener() {
+
 			public void onClick(View v) {
-				connecter = new Connecter(activity);
-				connecter.execute(tf_connect.getText().toString());
+				if (connected) {
+					connecter.disconnect();
+					buttonConnect.setText("Connect");
+					connected = false;
+				} else {
+					connected = true;
+					connecter = new Connecter(activity);
+					connecter.execute(tf_connect.getText().toString());
+					buttonConnect.setText("Disconnect");
+				}
 			}
     	});
     	
@@ -135,7 +150,7 @@ public class MainActivity extends Activity {
 
 					@Override
 					public void onPictureTaken(byte[] data, Camera camera) {
-						Log.d("debug", "taking picture took:"+(System.currentTimeMillis()-time)+"ms");
+						Log.d("debug", "taking picture took:"+(System.currentTimeMillis()-time)+"ms Größe:" + data.length);
 						newestPicture = data;
 						newPicAvailable = true;
 						synchronized (pictureSender) {

@@ -77,24 +77,49 @@ public class Detector {
 		IplImage orgImg;
 		if (iplimg != null) {
 			orgImg = iplimg;
-		} else orgImg = cvLoadImage("pics/balloon.jpeg");
+		} else orgImg = cvLoadImage("pics/test.jpg");
         System.out.println("took: " + (System.currentTimeMillis()-timestamp) + "ms");
         //create binary image of original size
         IplImage img1 = cvCreateImage(cvGetSize(orgImg), 8, 1);
         IplImage img2 = cvCreateImage(cvGetSize(orgImg), 8, 1);
+        IplImage img3 = cvCreateImage(cvGetSize(orgImg), 8, 1);
+        IplImage img4 = cvCreateImage(cvGetSize(orgImg), 8, 1);
         //apply thresholding
-        cvInRangeS(orgImg, cvScalar(0, 0, 120, 0), cvScalar(60, 60, 255, 0), img1);
+        cvInRangeS(orgImg, cvScalar(120, 180, 120, 0), cvScalar(140, 255, 140, 0), img1);
         
-        cvInRangeS(orgImg, cvScalar(60, 60, 200, 0), cvScalar(120, 120, 255, 0), img2);
+        cvInRangeS(orgImg, cvScalar(30, 100, 30, 0), cvScalar(60, 255, 60, 0), img2);
+        
+        cvInRangeS(orgImg, cvScalar(60, 140, 60, 0), cvScalar(120, 255, 120, 0), img3);
+        
+        cvInRangeS(orgImg, cvScalar(0, 70, 0, 0), cvScalar(30, 255, 30, 0), img4);
+        
         CvMemStorage storage=AbstractCvMemStorage.create();
         CvSeq contours = new CvContour();
         
         cvFindContours(img2, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
         CvScalar color = CV_RGB(255, 255, 255);
         
-        for( ; contours != null; contours = contours.h_next()) {
+        System.out.println();
+        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
         	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
         }
+        contours = new CvContour();
+        
+        
+        cvFindContours(img3, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
+        	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
+        }
+        contours = new CvContour();
+        
+        cvFindContours(img4, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+        
+        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
+        	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
+        }
+        
+        
+        
         
         cvNot(img1, img1);
         //smooth filter- median
@@ -113,10 +138,10 @@ public class Detector {
         cvThreshold(src, src, 1, 255, CV_THRESH_BINARY_INV);
         
         cvFindContours(src, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-        for( ; contours != null; contours = contours.h_next()) {
+        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
         	
         	double actual_area = Math.abs(cvContourArea(contours, CV_WHOLE_SEQ, 0));
-        	if (actual_area < 100) {
+        	if (actual_area < 0) {
         		CvScalar color = CV_RGB(0, 0, 0);
                 cvDrawContours( gry, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
 			} else {
@@ -144,7 +169,7 @@ public class Detector {
 		
 		double MAX_TOL = 1000.00;
 		// This value is the maximum permissible error between actual and estimated area.
-		double MIN_AREA = 400.00;
+		double MIN_AREA = 100.00;
 		// We need this to be high enough to get rid of things that are too small too
 		// have a definite shape.  Otherwise, they will end up as ellipse false positives.
 
@@ -164,7 +189,7 @@ public class Detector {
 	        cvFindContours( src, storage, contour, Loader.sizeof(CvContour.class), CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
 	        cvZero( dst );
 
-	        for( ; contour != null; contour = contour.h_next())
+	        for( ; contour != null && !contour.isNull(); contour = contour.h_next())
 	        {
 	            double actual_area = Math.abs(cvContourArea(contour, CV_WHOLE_SEQ, 0));
 	            System.out.println("actual area: " + actual_area);

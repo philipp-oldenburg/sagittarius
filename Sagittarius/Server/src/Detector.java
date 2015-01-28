@@ -101,24 +101,26 @@ public class Detector {
 //        cvInRangeS(imgHSV, cvScalar(0, 0, 0, 0), cvScalar(0, 0, 0, 0), img4);
         
         CvMemStorage storage=AbstractCvMemStorage.create();
-        CvSeq contours = new CvContour();
-        
-        cvFindContours(img2, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
         CvScalar color = CV_RGB(255, 255, 255);
-        
         System.out.println();
+        
+        CvSeq contours = new CvContour();
+        cvFindContours(img2, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+        
         for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
         	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
         }
-        contours = new CvContour();
         
         
+//        contours = new CvContour();
 //        cvFindContours(img3, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+// 
 //        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
 //        	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
 //        }
-//        contours = new CvContour();
 //        
+//        
+//        contours = new CvContour();
 //        cvFindContours(img4, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 //        
 //        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {

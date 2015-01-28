@@ -14,16 +14,18 @@ import static org.bytedeco.javacpp.opencv_core.cvXorS;
 import static org.bytedeco.javacpp.opencv_core.cvZero;
 import static org.bytedeco.javacpp.opencv_highgui.cvLoadImage;
 import static org.bytedeco.javacpp.opencv_highgui.cvSaveImage;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_BGR2HSV;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_CHAIN_APPROX_SIMPLE;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RETR_CCOMP;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RETR_EXTERNAL;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_THRESH_BINARY;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_THRESH_BINARY_INV;
-import static org.bytedeco.javacpp.opencv_imgproc.cvBoundingRect;
-import static org.bytedeco.javacpp.opencv_imgproc.cvContourArea;
-import static org.bytedeco.javacpp.opencv_imgproc.cvDilate;
-import static org.bytedeco.javacpp.opencv_imgproc.cvFindContours;
-import static org.bytedeco.javacpp.opencv_imgproc.cvThreshold;
+import static org.bytedeco.javacpp.opencv_imgproc.*;
+//import static org.bytedeco.javacpp.opencv_imgproc.cvBoundingRect;
+//import static org.bytedeco.javacpp.opencv_imgproc.cvContourArea;
+//import static org.bytedeco.javacpp.opencv_imgproc.cvDilate;
+//import static org.bytedeco.javacpp.opencv_imgproc.cvFindContours;
+//import static org.bytedeco.javacpp.opencv_imgproc.cvThreshold;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -77,21 +79,26 @@ public class Detector {
 		IplImage orgImg;
 		if (iplimg != null) {
 			orgImg = iplimg;
-		} else orgImg = cvLoadImage("pics/test.jpg");
+		} else orgImg = cvLoadImage("pics/Doppelphoto_rechtes_Auge.jpg");
         System.out.println("took: " + (System.currentTimeMillis()-timestamp) + "ms");
         //create binary image of original size
-        IplImage img1 = cvCreateImage(cvGetSize(orgImg), 8, 1);
-        IplImage img2 = cvCreateImage(cvGetSize(orgImg), 8, 1);
-        IplImage img3 = cvCreateImage(cvGetSize(orgImg), 8, 1);
-        IplImage img4 = cvCreateImage(cvGetSize(orgImg), 8, 1);
+        
+        IplImage imgHSV = cvCreateImage(cvGetSize(orgImg), 8, 3);
+        cvCvtColor(orgImg, imgHSV, CV_BGR2HSV);
+        
+        
+        IplImage img1 = cvCreateImage(cvGetSize(imgHSV), 8, 1);
+        IplImage img2 = cvCreateImage(cvGetSize(imgHSV), 8, 1);
+//        IplImage img3 = cvCreateImage(cvGetSize(imgHSV), 8, 1);
+//        IplImage img4 = cvCreateImage(cvGetSize(imgHSV), 8, 1);
         //apply thresholding
-        cvInRangeS(orgImg, cvScalar(120, 180, 120, 0), cvScalar(140, 255, 140, 0), img1);
+        cvInRangeS(imgHSV, cvScalar(60, 64, 204, 0), cvScalar(90, 255, 255, 0), img1);
         
-        cvInRangeS(orgImg, cvScalar(30, 100, 30, 0), cvScalar(60, 255, 60, 0), img2);
+        cvInRangeS(imgHSV, cvScalar(60, 128, 128, 0), cvScalar(90, 255, 255, 0), img2);
         
-        cvInRangeS(orgImg, cvScalar(60, 140, 60, 0), cvScalar(120, 255, 120, 0), img3);
+//        cvInRangeS(imgHSV, cvScalar(0, 0, 0, 0), cvScalar(0, 0, 0, 0), img3);
         
-        cvInRangeS(orgImg, cvScalar(0, 70, 0, 0), cvScalar(30, 255, 30, 0), img4);
+//        cvInRangeS(imgHSV, cvScalar(0, 0, 0, 0), cvScalar(0, 0, 0, 0), img4);
         
         CvMemStorage storage=AbstractCvMemStorage.create();
         CvSeq contours = new CvContour();
@@ -106,17 +113,17 @@ public class Detector {
         contours = new CvContour();
         
         
-        cvFindContours(img3, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
-        	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
-        }
-        contours = new CvContour();
-        
-        cvFindContours(img4, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-        
-        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
-        	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
-        }
+//        cvFindContours(img3, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+//        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
+//        	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
+//        }
+//        contours = new CvContour();
+//        
+//        cvFindContours(img4, storage, contours, Loader.sizeof(CvContour.class), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+//        
+//        for( ; contours != null && !contours.isNull(); contours = contours.h_next()) {
+//        	cvDrawContours( img1, contours, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
+//        }
         
         
         
@@ -169,7 +176,8 @@ public class Detector {
 		
 		double MAX_TOL = 1000.00;
 		// This value is the maximum permissible error between actual and estimated area.
-		double MIN_AREA = 100.00;
+		double MIN_AREA = 50.00;
+		//TODO test some values
 		// We need this to be high enough to get rid of things that are too small too
 		// have a definite shape.  Otherwise, they will end up as ellipse false positives.
 
@@ -189,24 +197,35 @@ public class Detector {
 	        cvFindContours( src, storage, contour, Loader.sizeof(CvContour.class), CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
 	        cvZero( dst );
 
-	        for( ; contour != null && !contour.isNull(); contour = contour.h_next())
-	        {
-	            double actual_area = Math.abs(cvContourArea(contour, CV_WHOLE_SEQ, 0));
-	            System.out.println("actual area: " + actual_area);
+	        CvSeq contourBiggest = null;
+	        double areaBiggest = 0;
+	        for( ; contour != null && !contour.isNull(); contour = contour.h_next()){
+	        	double actual_area = Math.abs(cvContourArea(contour, CV_WHOLE_SEQ, 0));
 	            if (actual_area < MIN_AREA)
 	                continue;
+	        	if (actual_area > areaBiggest) {
+	        		contourBiggest = contour;
+	        		areaBiggest = actual_area;
+	        	}
+	        	
+	        }
+	        
+	        if (contourBiggest != null) {
+	            double actual_area = Math.abs(cvContourArea(contourBiggest, CV_WHOLE_SEQ, 0));
+	            System.out.println("actual area: " + actual_area);
+
 
 	            //
 	            // FIXME:
 	            // Assuming the axes of the ellipse are vertical/perpendicular.
 	            //
 	            CvRect rect = null;
-	            if (contour instanceof CvContour) {
-	            	rect = ((CvContour) contour).rect();
+	            if (contourBiggest instanceof CvContour) {
+	            	rect = ((CvContour) contourBiggest).rect();
 				}
 	            else {
 	            	System.out.println("cvboundingrect");
-	            	rect = cvBoundingRect(contour,0);
+	            	rect = cvBoundingRect(contourBiggest,0);
 				}
 	            int A = rect.width() / 2; 
 	            int B = rect.height() / 2;
@@ -214,12 +233,12 @@ public class Detector {
 	            double error = Math.abs(actual_area - estimated_area);
 	            System.out.println("error: " + error);
 	            if (error > MAX_TOL)
-	                continue;    
+	                System.err.println("Fehlertoleranz überschritten!");;
 	            objectsAL.add(new Detector().new DetectedObject(rect.x() + A, rect.y() + B, rect.width(), rect.height()));
 	            System.out.println("center x: " + (rect.x() + A)  + " y: " + (rect.y() + B) + " A: " + A + " B: " + B + "\n");
 
 	            CvScalar color = CV_RGB( Math.random() * 255, Math.random() * 255, Math.random() * 255 );
-	            cvDrawContours( dst, contour, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
+	            cvDrawContours( dst, contourBiggest, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
 	        }
 	        cvSaveImage("pics/final.png", dst);
 	        

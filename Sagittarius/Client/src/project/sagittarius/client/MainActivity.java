@@ -1,5 +1,6 @@
 package project.sagittarius.client;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import android.app.Activity;
 import android.hardware.Camera;
@@ -15,6 +16,9 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
 
@@ -40,9 +44,10 @@ public class MainActivity extends Activity {
         autoPicturing = false;
         int camId = findFrontFacingCamera();
         camera = Camera.open(camId);
-        
+    
         Parameters parameters = camera.getParameters();
         parameters.setPictureSize(2048, 1232);
+        
         camera.setParameters(parameters);
         
 		SurfaceView mview = new SurfaceView(getApplicationContext());
@@ -134,7 +139,16 @@ public class MainActivity extends Activity {
 			}
 		}
 		
-		
+		protected void setDisplayOrientation(Camera camera, int angle) {
+			Method downPolymorphic;
+			try {
+				downPolymorphic = camera.getClass().getMethod(
+						"setDisplayOrientation", new Class[] { int.class });
+				if (downPolymorphic != null)
+					downPolymorphic.invoke(camera, new Object[] { angle });
+			} catch (Exception e1) {
+			}
+		}
 	}
 	
 	class PictureTaker extends Thread {

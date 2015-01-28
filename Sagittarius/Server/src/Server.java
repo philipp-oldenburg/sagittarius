@@ -19,6 +19,9 @@ public class Server {
 		
 		ClientWaiter clientWaiter = new ClientWaiter(server);
 		clientWaiter.start();
+		
+		BTSend btSend = new BTSend();
+		btSend.startConnection();
 	}
 	
 	

@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 public class Listener extends Thread {
 
 	private Socket client;
+	private boolean isRightEye;
 
 	public Listener(Socket client) {
 		this.client = client;
@@ -43,14 +44,18 @@ public class Listener extends Thread {
 					System.out.println(message.length);
 					
 					ImageIcon icon = new ImageIcon(message);
-					Image rotatedImage = rotate(icon.getImage(), 90);
-					BufferedImage image = toBufferedImage(rotatedImage);
+					Image img = icon.getImage();
+					if (isRightEye) {
+						img = rotate(icon.getImage(), 180);
+					}
+					//Image rotatedImage = rotate(icon.getImage(), 90);
+					BufferedImage image = toBufferedImage(img);
 //					Detector.DetectedObject[] objects = Detector.detectBalloon(image);
 //					Graphics2D g2 = image.createGraphics();
 //					for (Detector.DetectedObject detectedObject : objects) {
 //						g2.drawOval(detectedObject.x - (detectedObject.width/2), detectedObject.y - (detectedObject.height/2), detectedObject.width, detectedObject.height);
 //					}
-					image = resize(image, 600, 800);
+					image = resize(image, 768, 462);
 					myPanel.setImage(image);
 					myPanel.repaint();
 					frame.pack();
@@ -127,5 +132,9 @@ public class Listener extends Thread {
         Image img = (Image) bimage;
         return img;
     }
+
+	public void setRightEye(boolean b) {
+		this.isRightEye = b;
+	}
 
 }

@@ -21,6 +21,7 @@ public class Listener extends Thread {
 	private DataOutputStream out;
 	private ClientWaiter clientWaiter;
 	private boolean focused;
+	private Server server;
 	
 	public class Protocol {
 		public static final int FOCUSED = 0;
@@ -29,9 +30,10 @@ public class Listener extends Thread {
 		public static final int DATA = 3;
 	}
 
-	public Listener(Socket client, ServerSocket server, ClientWaiter clientWaiter) {
+	public Listener(Socket client, ServerSocket serverSocket, ClientWaiter clientWaiter, Server server2) {
 		this.client = client;
 		this.clientWaiter = clientWaiter;
+		this.server = server2;
 	}
 
 	public void run() {
@@ -67,7 +69,8 @@ public class Listener extends Thread {
 					Image img = icon.getImage();
 
 					BufferedImage bi = new BufferedImage(img.getWidth(null),img.getHeight(null),BufferedImage.TYPE_INT_BGR);
-
+					server.receivedPhoto(bi, isRightEye);
+					
 					Graphics2D g2 = bi.createGraphics();
 					g2.drawImage(img, 0, 0, null);
 					g2.dispose();

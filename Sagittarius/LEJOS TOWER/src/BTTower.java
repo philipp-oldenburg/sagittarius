@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 
 import lejos.nxt.*;
 import lejos.nxt.comm.*;
@@ -7,16 +8,29 @@ public class BTTower {
 
 	private static BTTower btReceive;
 	private Executer executer;
+	private DataInputStream dis;
+	private DataOutputStream dos;
+	private int angle;
+	ArrayList<Integer> executionList = new ArrayList<Integer>();
 
 	public class Protocol {
 		public static final int ROTATE_LEFT = 0;
 		public static final int ROTATE_RIGHT = 1;
 		public static final int ROTATE_STOP = 2;
+		
 		public static final int MOVE_UP = 3;
 		public static final int MOVE_DOWN = 4;
 		public static final int MOVE_STOP = 5;
 		
-		public static final int STOP_RUNNING = 7;
+		public static final int ANGLE_HOR = 6;
+		public static final int ANGLE_VER = 7;
+		
+		public static final int ROTATE_ANGLE_HOR = 8;
+		public static final int ROTATE_ANGLE_VER = 9;
+		
+		public static final int SHOOT = 10;
+		
+		public static final int STOP_RUNNING = 11;
 	}
 
 	public static void main(String[] args) {
@@ -32,11 +46,6 @@ public class BTTower {
 		String connected = "Connected";
 		String waiting = "Waiting...";
 		String closing = "Closing...";
-		
-		System.out.println(Bluetooth.getLocalAddress());
-		System.out.println(Bluetooth.getFriendlyName());
-		System.out.println(Bluetooth.getAddress());
-		System.out.println(Bluetooth.getName());
 
 		while (true) {
 			LCD.drawString(waiting, 0, 0);
@@ -44,25 +53,37 @@ public class BTTower {
 			LCD.clear();
 			LCD.drawString(connected, 0, 0);
 
-			DataInputStream dis = connection.openDataInputStream();
-			DataOutputStream dos = connection.openDataOutputStream();
+			dis = connection.openDataInputStream();
+			dos = connection.openDataOutputStream();
 
 			executer = new Executer();
 			executer.start();
 			
-			Motor.A.setSpeed(50);
-			Motor.B.setSpeed(10);
+			Motor.A.setSpeed(75);
+			Motor.B.setSpeed(20);
+			Motor.C.setSpeed(35);
 
 			loop: while (true) {
 				int n = dis.readInt();
+				if (dis.available() != 0) {
+					angle = dis.readInt();
+				}
 				System.out.println(n);
 //				LCD.drawInt(n, 0, 0, 1);
 				switch (n) {
 				case Protocol.STOP_RUNNING:
 					break loop;
+				case Protocol.ANGLE_HOR:
+					dos.writeInt(Motor.A.getPosition());
+					dos.flush();
+					break;
+				case Protocol.ANGLE_VER:
+					dos.writeInt(Motor.B.getPosition());
+					dos.flush();
+					break;
 
 				default:
-					executer.setExecutionCode(n);
+					executionList.add(n);
 					break;
 				}
 			}
@@ -81,16 +102,14 @@ public class BTTower {
 	}
 
 	class Executer extends Thread {
-
-		private int executionCode = 100;
-		private int oldExecutionCode = 100;
 		private boolean running = true;
 
 		@Override
 		public void run() {
 			while (running) {
-				if (oldExecutionCode != executionCode) {
-					oldExecutionCode = executionCode;
+				if (!executionList.isEmpty()) {
+					int executionCode = executionList.remove(0);
+					
 					switch (executionCode) {
 					case Protocol.MOVE_UP:
 						Motor.B.backward();
@@ -113,13 +132,29 @@ public class BTTower {
 						System.out.println("RIGHT");
 						break;
 					case Protocol.ROTATE_STOP:
-						Motor.A.stop();
+						Motor.A.suspendRegulation();
 						System.out.println("STOP_ROTATING");
+						break;
+					case Protocol.SHOOT:
+						Motor.C.rotate(3);
+						Motor.C.flt();
+						System.out.println("Shoot");
+						break;
+					case Protocol.ROTATE_ANGLE_HOR:
+						System.out.println("rotate hor:" + angle);
+						Motor.A.rotate(angle, false);
+						Motor.A.suspendRegulation();
+						break;
+					case Protocol.ROTATE_ANGLE_VER:
+						System.out.println("rotate ver:" + angle);
+						Motor.B.rotate(angle, false);
+						Motor.B.suspendRegulation();
 						break;
 					default:
 						break;
 					}
 				}
+				
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
@@ -131,10 +166,6 @@ public class BTTower {
 
 		public void stopRunning() {
 			running = false;
-		}
-
-		public void setExecutionCode(int code) {
-			executionCode = code;
 		}
 	}
 }

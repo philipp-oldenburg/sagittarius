@@ -30,6 +30,8 @@ public class BTRover {
 		String connected = "Connected";
 		String waiting = "Waiting...";
 		String closing = "Closing...";
+		
+		System.out.println(Motor.A.getPosition());
 
 		while (true) {
 			LCD.drawString(waiting, 0, 0);
@@ -45,6 +47,9 @@ public class BTRover {
 			
 			Motor.A.setSpeed(100);
 			Motor.B.setSpeed(100);
+			
+			System.out.println(Motor.A.getPosition());
+			System.out.println(Motor.B.getPosition());
 
 			loop: while (true) {
 				int n = dis.readInt();
@@ -106,8 +111,10 @@ public class BTRover {
 						System.out.println("RIGHT");
 						break;
 					case Protocol.STOP_MOVING:
-						Motor.A.stop();
-						Motor.B.stop();
+						Motor.A.suspendRegulation();
+						Motor.B.suspendRegulation();
+						System.out.println(Motor.A.getPosition());
+						System.out.println(Motor.B.getPosition());
 						System.out.println("STOP_MOVING");
 						break;
 					default:

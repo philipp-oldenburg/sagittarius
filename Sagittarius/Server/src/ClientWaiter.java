@@ -11,10 +11,12 @@ public class ClientWaiter extends Thread {
 
 	private ArrayList<Listener> listeners;
 	private ServerSocket serverSocket;
+	private Server server;
 
-	public ClientWaiter(ServerSocket serverSocket) {
+	public ClientWaiter(ServerSocket serverSocket, Server server) {
 		this.serverSocket = serverSocket;
 		this.listeners = new ArrayList<Listener>();
+		this.server = server;
 	}
 	
 	public void run() {
@@ -28,7 +30,7 @@ public class ClientWaiter extends Thread {
 			}
 			System.out.println("Connected to:" + client.getLocalAddress());
 			
-			Listener listener = new Listener(client, serverSocket, this);
+			Listener listener = new Listener(client, serverSocket, this, server);
 			JFrame frame = new JFrame();
 			int n = JOptionPane.showConfirmDialog(
 				    frame,

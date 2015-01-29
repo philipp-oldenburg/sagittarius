@@ -43,14 +43,14 @@ public class DetectorAdjusted {
 
 	public static void main(String[] argv) {
 		
-		double[] res = analyze();
-		if (res == null) {
-			System.out.println("No Match");
-		} else {
-			System.out.println("Distance = approx. " + res[0] + "cm");
-			System.out.println("Angle (Horizontal) = " + res[1] + "°");
-			System.out.println("Angle (Vertical) = " + res[2] + "°");
-		}
+//		double[] res = analyze();
+//		if (res == null) {
+//			System.out.println("No Match");
+//		} else {
+//			System.out.println("Distance = approx. " + res[0] + "cm");
+//			System.out.println("Angle (Horizontal) = " + res[1] + "°");
+//			System.out.println("Angle (Vertical) = " + res[2] + "°");
+//		}
 		
 		
 //		Vision vision = colorDetect(null, null);

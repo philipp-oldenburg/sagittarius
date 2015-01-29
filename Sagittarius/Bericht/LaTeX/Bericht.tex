@@ -1,0 +1,63 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\author{Philipp Oldenburg, Patrick Zumsteg, Simon Wallny}
+\title{Projekt „Sagittarius“}
+\date{Herbstsemester 2014}
+\begin{document}
+\maketitle
+\tableofcontents
+\section{Vorwort}
+Das Projekt „Sagittarius“, entstand im Rahmen der Vorlesung „Rechnerarchitekturen und Betriebssysteme“ an der Universität Basel im Herbstsemester 2014.\hfill\\
+Die bearbeitende Gruppe besteht aus Philipp Oldenburg, Patrick Zumsteg und Simon Wallny.
+\newpage
+\section{Abstract}
+ToDo\\
+
+\section{Projektidee}
+
+Grundidee des Projektes war es, mit dem Lego Mindstorms-Baukasten einen Roboter zu entwerfen und zu bauen, der in der Lage ist, Ziele zu erkennen, das Objekt anzuvisieren und mit einer eingebauten Armbrust darauf zu feuern.
+Ferner sollte der Roboter in der Lage sein sich zusätzlich zur Schwenkung zur Zielerfassung mithilfe einer fahrbaren Plattform zu bewegen.
+
+Dabei war von Anfang an klar, dass wir nicht nur mit den Baukästen allein auskommen würden; vor allem deswegen, weil wir dem NXT die komplexen Operationen, die für die Zielerkennung vonnöten sind, nicht zutrauten. Folglich erweiterten wir die Projektanforderungen auch noch das Auswerten von Bildern auf dem Laptop, sowie das Entwickeln einer Software, die aufgrund dieser Daten den Roboter steuert.
+
+\section{Umsetzung}
+
+Das ganze Projekt lässt sich sinnvollerweise in drei thematisch grundlegend verschiedene Teile gliedern:
+\begin{enumerate}
+\item
+Die Konstruktion des Roboters entsprechend den physischen Anforderungen.
+\item
+Die Zielerfassung; dazu gehört sowohl das Schiessen der Bilder als auch die Mustererkennung, um mit dem gewonnenen Bildmaterial ein Ziel als solches zu identifizieren, und ausserdem die Berechnung der Entfernung und Position des Ziels.
+\item
+ToDo. Programmierung des Laptops? Der Handys?
+\end{enumerate}
+
+\subsection{Konstruktion des Roboters}
+Die Bestandteile des Roboters und dessen Aufbau lassen sich direkt aus den Anforderungen ableiten:
+\begin{itemize}
+\item
+Er soll sich auf einer mobilen Plattform befinden. Hierfür eignete sich besonders eine 	Konstruktion, die nicht auf Rädern, sondern auf Raupen fährt, um maximale 	Manövrierbarkeit zu erreichen.
+\item
+Er soll Platz für zwei Kameras bieten. Der Plan war ursprünglich, mit Kameras zu arbeiten, die speziell für Lego-Roboter entworfen wurden. Diese waren allerdings alle mit erheblichen Kosten belastet, und die Tatsache, dass die geplante Positionsbestimmung des Ziels sogar zwei Kameras erfordert, dazu später mehr, kam uns hier auch nicht gerade entgegen. Glücklicherweise stellte sich heraus, dass zwei Teammitglieder identische Smartphones besassen, und einer von uns hatte auch schon einige Erfahrung in der Programmierung von Android-Apps. Diese 	Smartphones werden in eigens dafür gebauten Halterungen auf beiden Seiten des Roboters 	quasi als "Augen" eingesetzt.
+\item
+Er soll einen Geschützturm haben, der sich in horizontaler und in vertikaler Richtung orientieren lässt. Ausserdem sollte der Geschützturm natürlich noch eine Konstruktion 	enthalten, mit der irgendeine Form von Projektil angemessen zielsicher verschossen werden 	kann. Wir haben uns hier für eine etwas modifizierte Armbrustkonstruktion entschieden; das klassische Design mit Wurfarmen, die rechtwinklig zur Schusslinie stehen, ist mit Lego 	schwer umzusetzen, da diese Wurfarme unter grosser Spannung stehen, was die nicht besonders robusten Plastikteile vermutlich nicht ausgehalten hätten. Wir haben uns deshalb 	für eine inline-Konstruktion entschieden. Dies senkt einerseits die Spannung, unter der die Arme leiden, andererseits wird die gesamte Kraft des Gummibands dafür aufgewendet, den Bolzen zu beschleunigen.
+\end{itemize}
+\subsection{Zielerfassung}
+Während wir zuerst geplant hatten, das Ziel durch eine bestimmte Farbe zu kennzeichnen, etwa ein roter Ballon, entschieden wir uns bei der Umsetzung doch dafür, Ziele mit einem grünen Laserpointer zu markieren. Dies erwies sich als wesentlich eleganter, da die Zielerkennung schärfer und die Anwendungsbereiche breiter wurden. 
+
+Der wichtigste Teil bei der Umsetzung einer Zielerfassung ist die Positionsbestimmung des markierten Objekts.
+Im Einklang mit den Anforderungen einen Geschützturm auszurichten bot es sich an, die Position in Kugelkoordinaten zu erfassen, also als Vektor von Distanz, horizontaler Schwenkung und vertikaler Schwenkung.
+Während die Winkel schon aus dem Bild einer Kamera hervorgehen, ist die Bestimmung der Distanz grundlegend schwieriger. Aus den Bildern zweier Kameras dagegen lässt sich anhand der Abweichung in den Bildpositionen und den damit einhergehenden Winkeln der Abstand zum Ziel trigonometrisch bestimmen. Dabei hilft, dass die Erfassung eines Laserpointers ein sehr scharfes Ziel ist.
+Nun bot es sich an die Bildpositionen der erkannten Punkte mithilfe einer gemessenen Konstante zunächst in ein zweidimensionales,  kartesisches Hilfskoordinatensystem zu Übertragen, in dem die Positionen der Kameras bekannt sind und der Geschützturm sich im Nullpunkt befindet. Die Position des Ziels in diesem Hilfssystem zu finden ist so einfach wie 2 Geraden schneiden. So lässt sich die Distanz und horizontale Schwenkung aus Sicht des Turms bestimmen, und ersteres kann mithilfe einer weiteren gemessenen Konstante vom Hilfskoordinatensystem in Zentimeter transformiert werden.
+Für den Schritt vom Zwei- ins Dreidimensionale fehlt noch der Vertikale Winkel. Da sich beide Kameras auf gleicher Höhe Befinden liefern sie nur einen Wert für den vertikalen Winkel.
+\section{Resultate}
+
+\section{Bewertung und Ausblick}
+
+\end{document}

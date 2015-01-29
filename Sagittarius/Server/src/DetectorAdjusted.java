@@ -79,10 +79,14 @@ public class DetectorAdjusted {
 	 * Takes 2 Images and looks for a green laser point in them, then performes calculations for the target's position.
 	 * @param imgLeft
 	 * @param imgRight
-	 * @return double[3] or null if failed:<br>
+	 * @return double[7] or null if failed:<br>
 	 * result[0] = Distance in Centimeters<br>
 	 * result[1] = Horizontal Angle in Degrees<br>
 	 * result[2] = Vertical Angle in Degrees<br>
+	 * result[3] = xPos of Left Crosshair<br>
+	 * result[4] = yPos of Left Crosshair<br>
+	 * result[5] = xPos of Right Crosshair<br>
+	 * result[6] = yPos of Right Crosshair<br>
 	 */
 //	public static double[] analyze () {
 	public static double[] analyze (BufferedImage imgLeft, BufferedImage imgRight) {
@@ -460,7 +464,7 @@ public class DetectorAdjusted {
 		double angV = (Math.atan(((616 - ((coord.yLeft+coord.yRight)/2)) / CM2PX) / AC2CM) / (Math.PI * 2) * 360);
 //		System.out.println("Angle (Vertical) = " + angV + "°");
 		
-		double[] result = {dist * (AC2CM * 1.19), angH, angV};
+		double[] result = {dist * (AC2CM * 1.19), angH, angV, coord.xLeft, coord.yLeft, coord.xRight, coord.yRight};
 		
 		return result;
 	}

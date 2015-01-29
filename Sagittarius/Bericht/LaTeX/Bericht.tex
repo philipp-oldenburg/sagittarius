@@ -23,15 +23,15 @@ Die bearbeitende Gruppe besteht aus Philipp Oldenburg, Patrick Zumsteg und Simon
 \newpage
 \section{Abstract (mit Resultaten)}
 Im folgenden wird die Idee des Projekts beschrieben und die Anforderungen definiert. Anschließend wird auf die Umsetzung dieser Anforderungen eingegangen. Hierbei werden die Konstruktion des Roboters, die Funktionsweise der maschinellen Zielerfassung und die Interaktion zwischen den verwendeten Geräten ausgeführt. Im Anschluss werden die Resultate dargestellt:\hfill\\
-Der Sagittarius ist ein fahrbarer Geschützturm mit 2 Kameras und besitzt eine Armbrust mit bis zu 4 Metern Reichweite und ausreichend hoher Präzision. Er wird über kabellose Kommunikation mit einem Laptop gesteuert. Die automatische Zielerfassung erkennt mit einem Laserpointer markierten Ziele mit $\pm$1\degree horizontaler Abweichung und berechnet die Distanz auf etwa $\pm$20cm genau.\hfill\\
+Der Sagittarius ist ein fahrbarer Geschützturm mit 2 Kameras und besitzt eine Armbrust mit bis zu 4 Metern Reichweite und ausreichend hoher Präzision. Er wird über kabellose Kommunikation mit einem Laptop gesteuert. Die automatische Zielerfassung erkennt mit einem Laserpointer markierte Ziele mit $\pm$1\degree horizontaler Abweichung und berechnet die Distanz auf etwa $\pm$20cm genau.\hfill\\
 Danach werden die Resultate bewertet.
 
 \section{Projektidee}
 
 Grundidee des Projektes war es, mit dem Lego Mindstorms-Baukasten einen Roboter zu entwerfen und zu bauen, der in der Lage ist, Ziele zu erkennen, das Objekt anzuvisieren und mit einer eingebauten Armbrust darauf zu feuern.
-Ferner sollte der Roboter in der Lage sein sich zusätzlich zur Schwenkung zur Zielerfassung mithilfe einer fahrbaren Plattform zu bewegen.
+Ferner sollte der Roboter in der Lage sein, sich zusätzlich zur Schwenkung zur Zielerfassung mithilfe einer fahrbaren Plattform zu bewegen.
 
-Dabei war von Anfang an klar, dass wir nicht nur mit den Baukästen allein auskommen würden; vor allem deswegen, weil wir dem NXT die komplexen Operationen, die für die Zielerkennung vonnöten sind, nicht zutrauten. Folglich erweiterten wir die Projektanforderungen auch noch das Auswerten von Bildern auf dem Laptop, sowie das Entwickeln einer Software, die aufgrund dieser Daten den Roboter steuert.
+Dabei war von Anfang an klar, dass wir nicht nur mit den Baukästen allein auskommen würden; vor allem deswegen, weil wir dem NXT die komplexen Operationen, die für die Zielerkennung vonnöten sind, nicht zutrauten. Folglich erweiterten wir die Projektanforderungen auch noch um das Auswerten von Bildern auf dem Laptop, sowie das Entwickeln einer Software, die aufgrund dieser Daten den Roboter steuert.
 
 \section{Umsetzung}
 
@@ -67,15 +67,15 @@ Der wichtigste Teil bei der Umsetzung einer Zielerfassung ist die Positionsbesti
 Im Einklang mit den Anforderungen einen Geschützturm auszurichten bot es sich an, die Position in Kugelkoordinaten zu erfassen, also als Vektor von Distanz, horizontaler Schwenkung und vertikaler Schwenkung.
 Während die Winkel schon aus dem Bild \textit{einer} Kamera hervorgehen, ist die Bestimmung der Distanz grundlegend schwieriger. Aus den Bildern zweier Kameras dagegen lässt sich anhand der Abweichung in den Bildpositionen und den damit einhergehenden Winkeln der Abstand zum Ziel trigonometrisch bestimmen. Dabei hilft, dass die Erfassung eines Laserpointers ein sehr scharfes Ziel ist.
 
-Nun bot es sich an die Berechnung der Position in 2 Teile aufzuteilen. Der erste Teil ermittelt die Distanz und horizontale Schwenkung anhand der X-Koordinate des Laserpunktes auf den 2 Bildern.
+Nun bot es sich an, die Berechnung der Position in zwei Teile aufzuteilen. Der erste Teil ermittelt die Distanz und horizontale Schwenkung anhand der X-Koordinate des Laserpunktes auf den zwei Bildern.
 
-Dafür wird die Bildpositionen der erkannten Punkte mithilfe einer gemessenen Konstante zunächst in ein zweidimensionales,  kartesisches Hilfskoordinatensystem übertragen, in dem die Positionen der Kameras bekannt sind und der Geschützturm sich im Nullpunkt befindet. Die beiden Geraden durch die linke Kamera und den linken Bildpunkt sowie durch die rechte Kamera und den rechten Bildpunkt schneiden sich in der Position des Ziels.
+Dafür werden die Bildpositionen der erkannten Punkte mithilfe einer gemessenen Konstante zunächst in ein zweidimensionales,  kartesisches Hilfskoordinatensystem übertragen, in dem die Positionen der Kameras bekannt sind und der Geschützturm sich im Nullpunkt befindet. Die beiden Geraden durch die linke Kamera und den linken Bildpunkt sowie durch die rechte Kamera und den rechten Bildpunkt schneiden sich in der Position des Ziels.
 \hfill\\
 \hfill\\
 \includegraphics[scale=0.85]{../Bilder/PosBestGraph.png} 
 
-So lässt sich die Distanz und horizontale Schwenkung aus Sicht des Turms bestimmen, und ersteres kann mithilfe einer weiteren gemessenen Konstante vom Hilfskoordinatensystem in Zentimeter transformiert werden.
-Für den Schritt vom Zwei- ins Dreidimensionale fehlt noch der Vertikale Winkel. Da sich beide Kameras auf gleicher Höhe befinden liefern sie für das Ziel die gleich Höhe. (Es wird der Durchschnitt beider Werte verwendet, die sich aber nur um ein paar Pixel unterscheiden sollten). Diese kann dann vergleichsweise einfach mithilfe des gemessenen Abstands und der schon beim ersten Schritt verwendeten Konstanten in einen Winkel umgerechnet werden.
+So lässt sich die Distanz und horizontale Schwenkung aus Sicht des Turms bestimmen, und Ersteres kann mithilfe einer weiteren gemessenen Konstante vom Hilfskoordinatensystem in Zentimeter transformiert werden.
+Für den Schritt vom Zwei- ins Dreidimensionale fehlt noch der vertikale Winkel. Da sich beide Kameras auf gleicher Höhe befinden liefern sie für das Ziel die gleich Höhe. (Es wird der Durchschnitt beider Werte verwendet, die sich aber nur um ein paar Pixel unterscheiden sollten). Diese kann dann vergleichsweise einfach mithilfe des gemessenen Abstands und der schon beim ersten Schritt verwendeten Konstanten in einen Winkel umgerechnet werden.
 
 \subsection{Kommunikation}
 Grundsätzlich mussten wir uns um eine Verbindung zwischen NXT und den zwei Kameras (Smartphones) kümmern. Als Vermittlungsglied soll ein Server (Laptop) dienen, welcher auch die performanceintensiven Berechnungen wie beispielsweise die Bildverarbeitung erledigt. Letztendlich haben wir uns für eine kabellose Variante entschieden:
@@ -83,7 +83,7 @@ Grundsätzlich mussten wir uns um eine Verbindung zwischen NXT und den zwei Kame
 \item
 Der NXT soll via Bluetooth mit dem Rechner verbunden werden.
 \item
-Die zwei Kameras sollen via WLAN mit dem Rechner kommuzieren.
+Die zwei Kameras sollen via WLAN mit dem Rechner kommunizieren.
 \end{itemize}
 
 \subsubsection*{NXT $\leftrightarrow$ Laptop}
@@ -94,7 +94,7 @@ Die zwei Kameras sollen via WLAN mit dem Rechner kommuzieren.
   \end{center}
   \vspace{-15pt}
 \end{wrapfigure}
-Um mit dem NXT via Bluetooth kommunizieren zu können haben wir das Framework Lejos benutzt.
+Um mit dem NXT via Bluetooth kommunizieren zu können haben wir das Framework LeJOS benutzt.
 Es stellt eine Firmware für den NXT bereit, welche es ermöglicht Java-Programme auszuführen.
 Weiterhin gibt es Treiber für Windows-Rechner und ein Eclipse-Plugin, sodass es möglich ist über Eclipse das Programm auf den NXT zu laden und zu debuggen.
 \begin{wrapfigure}{R}{0.3\textwidth}
@@ -105,9 +105,9 @@ Weiterhin gibt es Treiber für Windows-Rechner und ein Eclipse-Plugin, sodass es
   \vspace{-15pt}
 \end{wrapfigure}
 Die Installation ist sehr mühsam, da die Treiber für den NXT viele Abhängigkeiten haben und nicht weiterentwickelt werden. Die neueste, von Lego bereitgestellte Distribution eines solchen Treibers ist sogar bekannterweise fehlerhaft, und wir mussten als Workaround eine third-party-Software verwenden, die allerdings den gleichen Zweck erfüllt.
-Lejos-Schnittstellen laufen nur unter 32-bit Anwendungen (Eclipse, Java).
+LeJOS-Schnittstellen laufen nur unter 32-bit Anwendungen (Eclipse, Java).
 
-Trotz alledem stellt Lejos sehr einfache Schnittstellen zur Verfügung, mit denen es einem möglich ist, ohne Probleme Motoren zu steuern und eine Bluetooth-Verbindung aufzubauen.
+Trotz alledem stellt LeJOS sehr einfache Schnittstellen zur Verfügung, mit denen es einem möglich ist, ohne Probleme Motoren zu steuern und eine Bluetooth-Verbindung aufzubauen.
 Ein kleines Interface ermöglicht es dem Benutzer den Roboter zu steuern:
 \begin{enumerate}
 \item Via UP, LEFT, DOWN, RIGHT lässt sich der Roboter steuern
@@ -141,7 +141,7 @@ Sobald der Server ein „OK“ von beiden Kameras erhalten hat, wird der Befehl 
 Auf dem Rechner werden die erhaltenen Fotos in einer GUI dargestellt und nach einer Mustererkennung ausgewertet.
 
 \subsubsection*{Lessons Learned Kommunikation}
-Die drahtlose Übertragung ist zum einen must-have für einen mobilen Roboter, doch andererseits führt dies zu Einbußen in der Übertragungsgeschwindigkeit. Die Übertragung der zwei Kamerabilder nimmt einige Sekunden in Anspruch. Dies ist aber prinzipiell kein Problem, da unser Roboter keine schnellen Reflexe im Kampf benötigt.
+Die drahtlose Übertragung ist zum einen must-have für einen mobilen Roboter, doch andererseits führt dies zu Einbußen in der Übertragungsgeschwindigkeit. Die Übertragung der zwei Kamerabilder nimmt einige Sekunden in Anspruch. Dies ist aber prinzipiell kein Problem, da unser Roboter keine schnellen Reaktionen benötigt.
 
 Es ist erstaunlich, wie viel Aufwand erforderlich ist, um mehrere Hardwarekomponenten miteinander zu verbinden und eine stabile Kommunikation zwischen diesen zu etablieren. Es lässt sich mit Sicherheit sagen, dass das Projekt noch um ein Vielfaches aufwendiger geworden wäre, wenn uns die früher genannten Frameworks und Schnittstellen-Softwares nicht zur Verfügung gestanden hätten.
 

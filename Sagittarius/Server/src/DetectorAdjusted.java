@@ -27,6 +27,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvDilate;
 import static org.bytedeco.javacpp.opencv_imgproc.cvFindContours;
 import static org.bytedeco.javacpp.opencv_imgproc.cvThreshold;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import org.bytedeco.javacpp.Loader;
@@ -42,27 +43,58 @@ public class DetectorAdjusted {
 
 	public static void main(String[] argv) {
 		
-		Vision vision = colorDetect(null, null);
+		double[] res = analyze(cvLoadImage("pics/wurst (1).jpg").getBufferedImage(), cvLoadImage("pics/wurst (2).jpg").getBufferedImage());
+		if (res == null) {
+			System.out.println("No Match");
+		} else {
+			System.out.println("Distance = approx. " + res[0] + "cm");
+			System.out.println("Angle (Horizontal) = " + res[1] + "°");
+			System.out.println("Angle (Vertical) = " + res[2] + "°");
+		}
+		
+		
+//		Vision vision = colorDetect(null, null);
 		//IplImage img = colorDetect(null, null);
 		
 		//img = fillOutConturesAndDeleteSmallOnes(img);
-		vision = fillOutConturesAndDeleteSmallOnes(vision);
+//		vision = fillOutConturesAndDeleteSmallOnes(vision);
 		
-		ResCoord coord = detectEllipse(vision);
-		System.out.println("Left:");
-		System.out.println("x=  " + coord.xLeft);
-		System.out.println("y=  " + coord.yLeft);
-		System.out.println("Right:");
-		System.out.println("x=  " + coord.xRight);
-		System.out.println("y=  " + coord.yRight);
-		System.out.println();
-		calculateFromResCoord(coord);
+//		ResCoord coord = detectEllipse(vision);
+//		System.out.println("Left:");
+//		System.out.println("x=  " + coord.xLeft);
+//		System.out.println("y=  " + coord.yLeft);
+//		System.out.println("Right:");
+//		System.out.println("x=  " + coord.xRight);
+//		System.out.println("y=  " + coord.yRight);
+//		System.out.println();
+//		calculateFromResCoord(coord);
 		
 //		DetectedObject[] objects = detectEllipse(vision);
 //		for (DetectedObject object : objects) {
 //			System.out.println(object.x + " " + object.y + " " + object.width + " " + object.height);
 //		}
 		
+	}
+	/**
+	 * Takes 2 Images and looks for a green laser point in them, then performes calculations for the target's position.
+	 * @param imgLeft
+	 * @param imgRight
+	 * @return double[3] or null if failed:<br>
+	 * result[0] = Distance in Centimeters<br>
+	 * result[1] = Horizontal Angle in Degrees<br>
+	 * result[2] = Vertical Angle in Degrees<br>
+	 */
+	public static double[] analyze (BufferedImage imgLeft, BufferedImage imgRight) {
+		if (imgLeft == null || imgRight == null) {
+			System.err.println("Analyze received bad parameters.");
+			return null;
+		}
+		IplImage iplLeft = IplImage.createFrom(imgLeft);
+		IplImage iplRight = IplImage.createFrom(imgRight);
+		
+		double[] result = calculateFromResCoord(detectEllipse(fillOutConturesAndDeleteSmallOnes(colorDetect(iplLeft, iplRight))));
+		
+		return result;
 	}
 	
 	public class DetectedObject {
@@ -74,7 +106,7 @@ public class DetectorAdjusted {
 		}
 		
 	}
-	
+//	
 //	public static DetectedObject[] detectBalloon(BufferedImage image) {
 //		IplImage iplImage = IplImage.createFrom(image);
 //
@@ -86,15 +118,15 @@ public class DetectorAdjusted {
 
 	private static Vision colorDetect(IplImage imgLeft, IplImage imgRight) {
 		//read image
-		long timestamp = System.currentTimeMillis();
+//		long timestamp = System.currentTimeMillis();
 		
 		if (imgLeft == null) {
-			imgLeft = cvLoadImage("pics/Doppelphoto2_linkes_Auge.jpg");
+			imgLeft = cvLoadImage("pics/kaese (1).jpg");
 		}
 		if (imgRight == null) {
-			imgRight = cvLoadImage("pics/Doppelphoto2_rechtes_Auge.jpg");
+			imgRight = cvLoadImage("pics/kaese (2).jpg");
 		}
-        System.out.println("took: " + (System.currentTimeMillis()-timestamp) + "ms");
+//        System.out.println("took: " + (System.currentTimeMillis()-timestamp) + "ms");
         //create binary image of original size
         
         IplImage imgHSVLeft = cvCreateImage(cvGetSize(imgLeft), 8, 3);
@@ -125,7 +157,7 @@ public class DetectorAdjusted {
         
         CvMemStorage storage=AbstractCvMemStorage.create();
         CvScalar color = CV_RGB(255, 255, 255);
-        System.out.println();
+//       System.out.println();
         
         //Left
         CvSeq contours = new CvContour();
@@ -207,8 +239,8 @@ public class DetectorAdjusted {
         
         
         
-        cvSaveImage("pics/out2Left.png", gryLeft);
-        cvSaveImage("pics/out2Right.png", gryRight);
+//        cvSaveImage("pics/out2Left.png", gryLeft);
+//        cvSaveImage("pics/out2Right.png", gryRight);
         return new Vision(gryLeft, gryRight);
 	}
 	
@@ -269,7 +301,7 @@ public class DetectorAdjusted {
 	        
 	        if (contourBiggest != null) {
 	            double actual_area = Math.abs(cvContourArea(contourBiggest, CV_WHOLE_SEQ, 0));
-	            System.out.println("actual area: " + actual_area);
+//	            System.out.println("actual area: " + actual_area);
 
 
 	            //
@@ -280,18 +312,18 @@ public class DetectorAdjusted {
 	            	rect = ((CvContour) contourBiggest).rect();
 				}
 	            else {
-	            	System.out.println("cvboundingrect");
+//	            	System.out.println("cvboundingrect");
 	            	rect = cvBoundingRect(contourBiggest,0);
 				}
 	            int A = rect.width() / 2; 
 	            int B = rect.height() / 2;
 	            double estimated_area = Math.PI * A * B;
 	            double error = Math.abs(actual_area - estimated_area);
-	            System.out.println("error: " + error);
+//	            System.out.println("error: " + error);
 	            if (error > MAX_TOL)
-	                System.err.println("Fehlertoleranz überschritten!\n");;
+//	                System.err.println("Fehlertoleranz überschritten!\n");;
 	            objectsAL.add(new DetectorAdjusted().new DetectedObject(rect.x() + A, rect.y() + B, rect.width(), rect.height()));
-	            System.out.println("center x: " + (rect.x() + A)  + " y: " + (rect.y() + B) + " A: " + A + " B: " + B + "\n");
+//	            System.out.println("center x: " + (rect.x() + A)  + " y: " + (rect.y() + B) + " A: " + A + " B: " + B + "\n");
 
 	            CvScalar color = CV_RGB( Math.random() * 255, Math.random() * 255, Math.random() * 255 );
 	            cvDrawContours( dstLeft, contourBiggest, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
@@ -299,9 +331,9 @@ public class DetectorAdjusted {
 	            result.xLeft = (rect.x() + A);
 	            result.yLeft = (rect.y() + B);
 	        } else {
-	        	System.out.println("No Result (Left)\n");
+//	        	System.out.println("No Result (Left)\n");
 	        }
-	        cvSaveImage("pics/finalLeft.png", dstLeft);
+//	        cvSaveImage("pics/finalLeft.png", dstLeft);
 	        
 	        
 	        
@@ -327,7 +359,7 @@ public class DetectorAdjusted {
 	        
 	        if (contourBiggest != null) {
 	            double actual_area = Math.abs(cvContourArea(contourBiggest, CV_WHOLE_SEQ, 0));
-	            System.out.println("actual area: " + actual_area);
+//	            System.out.println("actual area: " + actual_area);
 
 
 	            //
@@ -339,18 +371,18 @@ public class DetectorAdjusted {
 	            	rect = ((CvContour) contourBiggest).rect();
 				}
 	            else {
-	            	System.out.println("cvboundingrect");
+//	            	System.out.println("cvboundingrect");
 	            	rect = cvBoundingRect(contourBiggest,0);
 				}
 	            int A = rect.width() / 2; 
 	            int B = rect.height() / 2;
 	            double estimated_area = Math.PI * A * B;
 	            double error = Math.abs(actual_area - estimated_area);
-	            System.out.println("error: " + error);
+//	            System.out.println("error: " + error);
 	            if (error > MAX_TOL)
-	                System.err.println("Fehlertoleranz überschritten!\n");;
+//	                System.err.println("Fehlertoleranz überschritten!\n");;
 	            objectsAL.add(new DetectorAdjusted().new DetectedObject(rect.x() + A, rect.y() + B, rect.width(), rect.height()));
-	            System.out.println("center x: " + (rect.x() + A)  + " y: " + (rect.y() + B) + " A: " + A + " B: " + B + "\n");
+//	            System.out.println("center x: " + (rect.x() + A)  + " y: " + (rect.y() + B) + " A: " + A + " B: " + B + "\n");
 
 	            CvScalar color = CV_RGB( Math.random() * 255, Math.random() * 255, Math.random() * 255 );
 	            cvDrawContours( dstRight, contourBiggest, color, color, -1, CV_FILLED, 8, cvPoint(0,0));
@@ -358,9 +390,9 @@ public class DetectorAdjusted {
 	            result.xRight = 2047 - (rect.x() + A);
 	            result.yRight = 1231 - (rect.y() + B);
 	        } else {
-	        	System.out.println("No Result (Right)\n");
+//	        	System.out.println("No Result (Right)\n");
 	        }
-	        cvSaveImage("pics/finalRight.png", dstRight);
+//	        cvSaveImage("pics/finalRight.png", dstRight);
 	        
 	    }
 	    
@@ -371,21 +403,26 @@ public class DetectorAdjusted {
 //		}
 //	    return objects;
 	}
-	
-	private static void calculateFromResCoord(ResCoord coord) {
+
+	private static double[] calculateFromResCoord(ResCoord coord) {
+		
+		if (coord.xLeft == -1 ||coord.xRight == -1 || coord.yLeft == -1 || coord.yRight == -1) {
+			return null;
+		}
+		
 		final double CM2PX = 115.0;
 		final double AC2CM = 15.9;
 		
 		final double lx1 = -1;
 		final double ly1 = 0;
 		double lx2 = (((coord.xLeft - 1024) / CM2PX) / AC2CM) - 1;
-		System.out.println(lx2);
+//		System.out.println(lx2);
 		final double ly2 = 1;
 		
 		final double rx1 = 1;
 		final double ry1 = 0;
 		double rx2 = (((coord.xRight - 1024) / CM2PX) / AC2CM) + 1;
-		System.out.println(rx2);
+//		System.out.println(rx2);
 		final double ry2 = 1;
 		
 		double la = ly1-ly2;
@@ -406,17 +443,21 @@ public class DetectorAdjusted {
 		double y = ( ra / la * lc - rc ) / (rb - ra / la * lb );
 		double x = (lb * y + lc) / (-la);
 		
-		System.out.println("X = " + x + ", Y = " + y);
+//		System.out.println("X = " + x + ", Y = " + y);
 		
 		
 		
 		double dist = Math.sqrt((x*x)+(y*y));
-		System.out.println("rawdist="+dist);
-		System.out.println("Distance = approx. " + dist * (AC2CM * 1.19) + "cm");
+//		System.out.println("rawdist="+dist);
+//		System.out.println("Distance = approx. " + dist * (AC2CM * 1.19) + "cm");
 		double angH = ((Math.asin(x / dist)) / (Math.PI * 2)) * 360;
-		System.out.println("Angle (Horizontal) = " + angH + "°");
+//		System.out.println("Angle (Horizontal) = " + angH + "°");
 		double angV = (Math.atan(((616 - ((coord.yLeft+coord.yRight)/2)) / CM2PX) / AC2CM) / (Math.PI * 2) * 360);
-		System.out.println("Angle (Vertical) = " + angV + "°");
+//		System.out.println("Angle (Vertical) = " + angV + "°");
+		
+		double[] result = {dist * (AC2CM * 1.19), angH, angV};
+		
+		return result;
 	}
 
 }

@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
 
-public class BTSend {
+public class BTRover {
 	
 	private static DataOutputStream dos;
 	private static DataInputStream dis;
@@ -30,7 +30,7 @@ public class BTSend {
 	}
 
 	public void createFrame(ClientWaiter clientWaiter) {
-		JFrame frame = new JFrame("Control");
+		JFrame frame = new JFrame("Rover Control");
 		
 		GridLayout gridLayout = new GridLayout(2,3, 10, 10);
 		

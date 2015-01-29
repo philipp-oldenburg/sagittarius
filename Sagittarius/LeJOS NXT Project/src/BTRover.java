@@ -3,9 +3,9 @@ import java.io.*;
 import lejos.nxt.*;
 import lejos.nxt.comm.*;
 
-public class BTReceive {
+public class BTRover {
 
-	private static BTReceive btReceive;
+	private static BTRover btReceive;
 	private Executer executer;
 
 	public class Protocol {
@@ -19,7 +19,7 @@ public class BTReceive {
 
 	public static void main(String[] args) {
 		try {
-			btReceive = new BTReceive();
+			btReceive = new BTRover();
 			btReceive.run();
 		} catch (IOException e) {
 			e.printStackTrace();

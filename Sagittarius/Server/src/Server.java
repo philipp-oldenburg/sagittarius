@@ -26,8 +26,11 @@ public class Server {
 		ClientWaiter clientWaiter = new ClientWaiter(server);
 		clientWaiter.start();
 		
-		BTSend btSend = new BTSend();
-		btSend.createFrame(clientWaiter);
+		BTRover btRover = new BTRover();
+		btRover.createFrame(clientWaiter);
+		
+		BTTower btTower = new BTTower();
+		btTower.createFrame(clientWaiter);
 	}
 	
 	

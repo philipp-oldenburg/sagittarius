@@ -79,10 +79,10 @@ public class DetectorAdjusted {
 		long timestamp = System.currentTimeMillis();
 		
 		if (imgLeft == null) {
-			imgLeft = cvLoadImage("pics/Doppelphoto_linkes_Auge.jpg");
+			imgLeft = cvLoadImage("pics/Doppelphoto3_linkes_Auge.jpg");
 		}
 		if (imgRight == null) {
-			imgRight = cvLoadImage("pics/Doppelphoto_rechtes_Auge.jpg");
+			imgRight = cvLoadImage("pics/Doppelphoto3_rechtes_Auge.jpg");
 		}
         System.out.println("took: " + (System.currentTimeMillis()-timestamp) + "ms");
         //create binary image of original size
@@ -106,6 +106,11 @@ public class DetectorAdjusted {
         cvInRangeS(imgHSVLeft, cvScalar(60, 128, 128, 0), cvScalar(90, 255, 255, 0), imgLeft2);
         cvInRangeS(imgHSVRight, cvScalar(60, 64, 204, 0), cvScalar(90, 255, 255, 0), imgRight1);
         cvInRangeS(imgHSVRight, cvScalar(60, 128, 128, 0), cvScalar(90, 255, 255, 0), imgRight2);
+        
+//        cvInRangeS(imgHSVLeft, cvScalar(60, 64, 204, 0), cvScalar(90, 255, 255, 0), imgLeft1);
+//        cvInRangeS(imgHSVLeft, cvScalar(60, 128, 204, 0), cvScalar(90, 255, 255, 0), imgLeft2);
+//        cvInRangeS(imgHSVRight, cvScalar(60, 64, 204, 0), cvScalar(90, 255, 255, 0), imgRight1);
+//        cvInRangeS(imgHSVRight, cvScalar(60, 128, 204, 0), cvScalar(90, 255, 255, 0), imgRight2);
         
         
         CvMemStorage storage=AbstractCvMemStorage.create();
@@ -274,7 +279,7 @@ public class DetectorAdjusted {
 	            double error = Math.abs(actual_area - estimated_area);
 	            System.out.println("error: " + error);
 	            if (error > MAX_TOL)
-	                System.err.println("Fehlertoleranz überschritten!");;
+	                System.err.println("Fehlertoleranz überschritten!\n");;
 	            objectsAL.add(new DetectorAdjusted().new DetectedObject(rect.x() + A, rect.y() + B, rect.width(), rect.height()));
 	            System.out.println("center x: " + (rect.x() + A)  + " y: " + (rect.y() + B) + " A: " + A + " B: " + B + "\n");
 
@@ -283,6 +288,8 @@ public class DetectorAdjusted {
 	            
 	            result.xLeft = (rect.x() + A);
 	            result.yLeft = (rect.y() + B);
+	        } else {
+	        	System.out.println("No Result (Left)\n");
 	        }
 	        cvSaveImage("pics/finalLeft.png", dstLeft);
 	        
@@ -331,7 +338,7 @@ public class DetectorAdjusted {
 	            double error = Math.abs(actual_area - estimated_area);
 	            System.out.println("error: " + error);
 	            if (error > MAX_TOL)
-	                System.err.println("Fehlertoleranz überschritten!");;
+	                System.err.println("Fehlertoleranz überschritten!\n");;
 	            objectsAL.add(new DetectorAdjusted().new DetectedObject(rect.x() + A, rect.y() + B, rect.width(), rect.height()));
 	            System.out.println("center x: " + (rect.x() + A)  + " y: " + (rect.y() + B) + " A: " + A + " B: " + B + "\n");
 
@@ -340,6 +347,8 @@ public class DetectorAdjusted {
 	            
 	            result.xRight = 2047 - (rect.x() + A);
 	            result.yRight = 1231 - (rect.y() + B);
+	        } else {
+	        	System.out.println("No Result (Right)\n");
 	        }
 	        cvSaveImage("pics/finalRight.png", dstRight);
 	        
@@ -354,23 +363,34 @@ public class DetectorAdjusted {
 	}
 	
 	private static void calculateFromResCoord(ResCoord coord) {
+		final double CM2PX = 115.0;
+		final double AC2CM = 15.9;
+		
 		final double lx1 = -1;
 		final double ly1 = 0;
-		double lx2 = (coord.xLeft / 114.0);
+		double lx2 = (((coord.xLeft - 1024) / CM2PX) / AC2CM) - 1;
+		System.out.println(lx2);
 		final double ly2 = 1;
 		
 		final double rx1 = 1;
 		final double ry1 = 0;
-		double rx2 = (coord.xRight / 114.0);
+		double rx2 = (((coord.xRight - 1024) / CM2PX) / AC2CM) + 1;
+		System.out.println(rx2);
 		final double ry2 = 1;
 		
 		double la = ly1-ly2;
+//		System.out.println(la);
 		double lb = lx2-lx1;
+//		System.out.println(lb);
 		double lc = lx1*ly2 - lx2*ly1;
+//		System.out.println(lc);
 		
 		double ra = ry1-ry2;
+//		System.out.println(ra);
 		double rb = rx2-rx1;
+//		System.out.println(rb);
 		double rc = rx1*ry2 - rx2*ry1;
+//		System.out.println(rc);
 		
 		
 		double y = ( ra / la * lc - rc ) / (rb - ra / la * lb );
@@ -378,11 +398,14 @@ public class DetectorAdjusted {
 		
 		System.out.println("X = " + x + ", Y = " + y);
 		
+		
+		
 		double dist = Math.sqrt((x*x)+(y*y));
-		System.out.println("Distance = approx. " + 15.9 * dist + "cm");
-		double angH = ((Math.asin(y / dist)) / (Math.PI * 2)) * 360;
+		System.out.println("rawdist="+dist);
+		System.out.println("Distance = approx. " + dist * AC2CM + "cm");
+		double angH = ((Math.asin(x / dist)) / (Math.PI * 2)) * 360;
 		System.out.println("Angle (Horizontal) = " + angH + "°");
-		double angV = (Math.atan(((616-((coord.yLeft+coord.yRight)/2))/(114))/(dist))) / (Math.PI * 2) * 360;
+		double angV = (Math.atan(((616 - ((coord.yLeft+coord.yRight)/2)) / CM2PX) / AC2CM) / (Math.PI * 2) * 360);
 		System.out.println("Angle (Vertical) = " + angV + "°");
 	}
 

@@ -28,12 +28,8 @@ public class BTSend {
 		public static final int STOP_MOVING = 4;
 		public static final int STOP_RUNNING = 5;
 	}
-	
-	public void startConnection() {
-		createFrame();
-	}
 
-	private static void createFrame() {
+	public void createFrame(ClientWaiter clientWaiter) {
 		JFrame frame = new JFrame("Control");
 		
 		GridLayout gridLayout = new GridLayout(2,3, 10, 10);
@@ -41,7 +37,7 @@ public class BTSend {
 		JPanel panel = new JPanel(gridLayout);
 
 		// Create a BindingFactory with the default margin and control spacing:
-		int i = 2;
+		int i = 3;
 		int j = 3;
 		JPanel[][] panelHolder = new JPanel[i][j];    
 		panel.setLayout(new GridLayout(i,j, 10, 10));
@@ -59,8 +55,10 @@ public class BTSend {
 		JButton right = new JButton("RIGHT");
 		JButton disconnect = new JButton("DISC");
 		JButton btConnect = new JButton("BTConnect");
-		assignMouseListener(up, down, left, right, disconnect, btConnect);
+		JButton btSendPic = new JButton("Send Pic");
+		assignMouseListener(up, down, left, right, disconnect, btConnect, btSendPic, clientWaiter);
 		
+		panelHolder[2][1].add(btSendPic);
 		panelHolder[0][0].add(btConnect);
 		panelHolder[0][1].add(up);
 		panelHolder[0][2].add(disconnect);
@@ -73,7 +71,7 @@ public class BTSend {
 		frame.setVisible(true);
 	}
 
-	private static void assignMouseListener(JButton up, JButton down, JButton left, JButton right, JButton disconnect, JButton btConnect) {
+	private static void assignMouseListener(JButton up, JButton down, JButton left, JButton right, JButton disconnect, JButton btConnect, JButton btSendPic, final ClientWaiter clientWaiter) {
 		up.addMouseListener(new MouseListener() {
 			
 			@Override
@@ -286,6 +284,13 @@ public class BTSend {
 				
 				dos = new DataOutputStream(conn.getOutputStream());
 				dis = new DataInputStream(conn.getInputStream());
+			}
+		});
+		btSendPic.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				clientWaiter.startSynchronizedPicture();
 			}
 		});
 	}

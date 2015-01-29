@@ -84,18 +84,18 @@ public class DetectorAdjusted {
 	 * result[1] = Horizontal Angle in Degrees<br>
 	 * result[2] = Vertical Angle in Degrees<br>
 	 */
-	public static double[] analyze () {
-//	public static double[] analyze (BufferedImage imgLeft, BufferedImage imgRight) {
-//		if (imgLeft == null || imgRight == null) {
-//			System.err.println("Analyze received bad parameters.");
-//			return null;
-//		}
+//	public static double[] analyze () {
+	public static double[] analyze (BufferedImage imgLeft, BufferedImage imgRight) {
+		if (imgLeft == null || imgRight == null) {
+			System.err.println("Analyze received bad parameters.");
+			return null;
+		}
 		
-		IplImage imgLeft = cvLoadImage("pics/1.jpg");
-		IplImage imgRight = cvLoadImage("pics/2.jpg");
+//		IplImage imgLeft = cvLoadImage("pics/1.jpg");
+//		IplImage imgRight = cvLoadImage("pics/2.jpg");
 		
-//		IplImage iplLeft = IplImage.createFrom(imgLeft);
-//		IplImage iplRight = IplImage.createFrom(imgRight);
+		IplImage iplLeft = IplImage.createFrom(imgLeft);
+		IplImage iplRight = IplImage.createFrom(imgRight);
 		
 		double[] result = calculateFromResCoord(detectEllipse(fillOutConturesAndDeleteSmallOnes(colorDetect(iplLeft, iplRight))));
 		

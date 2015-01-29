@@ -89,10 +89,10 @@ public class DetectorAdjusted {
 		long timestamp = System.currentTimeMillis();
 		
 		if (imgLeft == null) {
-			imgLeft = cvLoadImage("pics/Doppelphoto3_linkes_Auge.jpg");
+			imgLeft = cvLoadImage("pics/Doppelphoto2_linkes_Auge.jpg");
 		}
 		if (imgRight == null) {
-			imgRight = cvLoadImage("pics/Doppelphoto3_rechtes_Auge.jpg");
+			imgRight = cvLoadImage("pics/Doppelphoto2_rechtes_Auge.jpg");
 		}
         System.out.println("took: " + (System.currentTimeMillis()-timestamp) + "ms");
         //create binary image of original size
@@ -412,7 +412,7 @@ public class DetectorAdjusted {
 		
 		double dist = Math.sqrt((x*x)+(y*y));
 		System.out.println("rawdist="+dist);
-		System.out.println("Distance = approx. " + dist * AC2CM + "cm");
+		System.out.println("Distance = approx. " + dist * (AC2CM * 1.19) + "cm");
 		double angH = ((Math.asin(x / dist)) / (Math.PI * 2)) * 360;
 		System.out.println("Angle (Horizontal) = " + angH + "°");
 		double angV = (Math.atan(((616 - ((coord.yLeft+coord.yRight)/2)) / CM2PX) / AC2CM) / (Math.PI * 2) * 360);

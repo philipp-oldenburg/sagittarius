@@ -1,0 +1,6 @@
+Der Roboter selbst erfüllt alle Anforderungen, die ursprünglich gestellt wurden. Die effektive Reichweite beträgt bei maximalem Abschusswinkel etwa 4 Meter. 
+Sowohl die Bewegung auf den Raupen als auch die horizontale Ausrichtung des Geschützturms ist sehr präzise, und kann die Genauigkeit der Bildauswertung 
+vollkommen nutzen. Die vertikale Ausrichtung ist etwas weniger präzise, und auf ungefähr 20° limitiert. Allerdings ist dies auch kein grosses Problem, da 
+das Projektil auch bei grösseren Entfernungen nicht sonderlich stark abfällt. Das Verschiessen von Holzspiessen, die einen Ballon effektiv zum Platzen gebracht
+hätten, war uns leider nicht möglich. Stattdessen verschiessen wir Lego-Verstrebungen, die zwar keine Spitze haben, aber trotzdem eine durchaus adäquate Menge
+an Energie an ihr Ziel abgeben.

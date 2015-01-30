@@ -10,6 +10,10 @@ import javax.swing.JOptionPane;
 public class ClientWaiter extends Thread {
 
 	private ArrayList<Listener> listeners;
+	public ArrayList<Listener> getListeners() {
+		return listeners;
+	}
+
 	private ServerSocket serverSocket;
 	private Server server;
 

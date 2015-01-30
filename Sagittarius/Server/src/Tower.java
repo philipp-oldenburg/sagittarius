@@ -35,7 +35,7 @@ public class Tower {
 				dos.writeInt(TowerProtocol.ANGLE_VER);
 				dos.flush();
 				int angle = dis.readInt() - resetAngleVertical;
-				rotateAngleVertical(-angle + param*7, true);
+				rotateAngleVertical(angle + param, true);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -62,7 +62,7 @@ public class Tower {
 		if (isInitialized) {
 			try {
 				dos.writeInt(TowerProtocol.ROTATE_ANGLE_VER);
-				dos.writeInt(motor ? angle : angle*7);
+				dos.writeInt(motor ? -angle : -angle);
 				dos.flush();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -81,7 +81,7 @@ public class Tower {
 				dos.writeInt(TowerProtocol.ANGLE_VER);
 				dos.flush();
 				angle = dis.readInt() - resetAngleVertical;
-				rotateAngleVertical(-angle, true);
+				rotateAngleVertical(angle, true);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

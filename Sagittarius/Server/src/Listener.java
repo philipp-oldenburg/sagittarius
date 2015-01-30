@@ -18,11 +18,20 @@ public class Listener extends Thread {
 
 	private Socket client;
 	private boolean isRightEye;
+	public boolean isRightEye() {
+		return isRightEye;
+	}
+
 	private DataOutputStream out;
 	private ClientWaiter clientWaiter;
 	private boolean focused;
 	private Server server;
+	private MyJPanel myPanel;
 	
+	public MyJPanel getMyPanel() {
+		return myPanel;
+	}
+
 	public class Protocol {
 		public static final int FOCUSED = 0;
 		public static final int SHOT = 1;
@@ -46,7 +55,7 @@ public class Listener extends Thread {
 		}
 		
 		JFrame frame = new JFrame();
-		MyJPanel myPanel = new MyJPanel();
+		myPanel = new MyJPanel();
 		frame.add(myPanel);
 		frame.pack();
 		frame.setVisible(true);

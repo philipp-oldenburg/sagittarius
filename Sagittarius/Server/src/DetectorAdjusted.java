@@ -16,6 +16,7 @@ import static org.bytedeco.javacpp.opencv_highgui.cvLoadImage;
 import static org.bytedeco.javacpp.opencv_highgui.cvSaveImage;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_BGR2HSV;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RGB2BGR;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_RGB2HSV;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_CHAIN_APPROX_SIMPLE;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RETR_CCOMP;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RETR_EXTERNAL;
@@ -102,8 +103,8 @@ public class DetectorAdjusted {
 		IplImage iplLeft = IplImage.createFrom(imgLeft);
 		IplImage iplRight = IplImage.createFrom(imgRight);
 		
-		cvCvtColor(iplLeft, iplLeft, CV_RGB2BGR);
-		cvCvtColor(iplRight, iplRight, CV_RGB2BGR);
+//		cvCvtColor(iplLeft, iplLeft, CV_RGB2BGR);
+//		cvCvtColor(iplRight, iplRight, CV_RGB2BGR);
 		
 		double[] result = calculateFromResCoord(detectEllipse(fillOutConturesAndDeleteSmallOnes(colorDetect(iplLeft, iplRight))));
 		
@@ -144,8 +145,8 @@ public class DetectorAdjusted {
         
         IplImage imgHSVLeft = cvCreateImage(cvGetSize(imgLeft), 8, 3);
         IplImage imgHSVRight = cvCreateImage(cvGetSize(imgRight), 8, 3);
-        cvCvtColor(imgLeft, imgHSVLeft, CV_BGR2HSV);
-        cvCvtColor(imgRight, imgHSVRight, CV_BGR2HSV);
+        cvCvtColor(imgLeft, imgHSVLeft, CV_RGB2HSV);
+        cvCvtColor(imgRight, imgHSVRight, CV_RGB2HSV);
         
       //TODO Remove after Testing
         cvSaveImage("pics/out0Left.jpg", imgLeft);

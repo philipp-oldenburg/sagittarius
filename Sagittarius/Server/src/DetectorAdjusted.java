@@ -15,6 +15,7 @@ import static org.bytedeco.javacpp.opencv_core.cvZero;
 import static org.bytedeco.javacpp.opencv_highgui.cvLoadImage;
 import static org.bytedeco.javacpp.opencv_highgui.cvSaveImage;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_BGR2HSV;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_RGB2BGR;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_CHAIN_APPROX_SIMPLE;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RETR_CCOMP;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RETR_EXTERNAL;
@@ -100,6 +101,9 @@ public class DetectorAdjusted {
 		
 		IplImage iplLeft = IplImage.createFrom(imgLeft);
 		IplImage iplRight = IplImage.createFrom(imgRight);
+		
+		cvCvtColor(iplLeft, iplLeft, CV_RGB2BGR);
+		cvCvtColor(iplRight, iplRight, CV_RGB2BGR);
 		
 		double[] result = calculateFromResCoord(detectEllipse(fillOutConturesAndDeleteSmallOnes(colorDetect(iplLeft, iplRight))));
 		
